@@ -1,8 +1,8 @@
 <script>
   import { Event } from "@/entities/Event";
   import { User } from "@/entities/User";
-  import { Button } from "@/components/ui/Button.svelte";
-  import { Input } from "@/components/ui/Input.svelte";
+  import Button from "@/components/ui/Button.svelte";
+  import Input from "@/components/ui/Input.svelte";
   import { MapPin, Calendar, Users, Filter, Search, Zap } from "lucide-svelte";
   import { createPageUrl } from "@/utils";
   import EventCard from "@/components/events/EventCard.svelte";

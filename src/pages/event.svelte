@@ -1,15 +1,18 @@
 <script>
-  import { page } from '@roxi/routify';
+  import { url } from '@roxi/routify';
   import { Event } from "@/entities/Event";
   import { MapPin, User as UserIcon, Calendar } from "lucide-svelte";
-  import { Button } from "@/components/ui/Button.svelte";
+  import Button from "@/components/ui/Button.svelte";
   import Layout from "@/components/Layout.svelte";
 
   let event = $state(null);
   let loading = $state(true);
 
   $effect(async () => {
-    const eventId = $page.query.id;
+    const currentUrl = $url;
+    const urlObj = new URL(currentUrl, window.location.origin);
+    const eventId = urlObj.searchParams.get('id');
+
     if (!eventId) {
       loading = false;
       return;

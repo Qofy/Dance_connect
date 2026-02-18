@@ -1,10 +1,10 @@
 <script>
   import { goto } from '@roxi/routify';
   import { Event } from "@/entities/Event";
-  import { Button } from "@/components/ui/Button.svelte";
-  import { Input } from "@/components/ui/Input.svelte";
-  import { Textarea } from "@/components/ui/Textarea.svelte";
-  import { Select } from "@/components/ui/Select.svelte";
+  import Button from "@/components/ui/Button.svelte";
+  import Input from "@/components/ui/Input.svelte";
+  import Textarea from "@/components/ui/Textarea.svelte";
+  import Select from "@/components/ui/Select.svelte";
   import { PlusCircle } from "lucide-svelte";
   import DanceStylePicker from "@/components/forms/DanceStylePicker.svelte";
   import Layout from "@/components/Layout.svelte";

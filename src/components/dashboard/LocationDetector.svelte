@@ -1,5 +1,5 @@
 <script>
-  import { Button } from "@/components/ui/Button.svelte";
+  import Button from "@/components/ui/Button.svelte";
   import { MapPin, Loader2 } from "lucide-svelte";
 
   let { onLocationFound } = $props();

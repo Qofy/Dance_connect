@@ -5,7 +5,7 @@
   import { Mail, Phone, MapPin, Edit, User as UserIcon, Shield } from "lucide-svelte";
   import { goto } from '@roxi/routify';
   import EventCard from "@/components/events/EventCard.svelte";
-  import { Button } from "@/components/ui/Button.svelte";
+  import Button from "@/components/ui/Button.svelte";
   import { createPageUrl } from "@/utils";
   import Layout from "@/components/Layout.svelte";
 

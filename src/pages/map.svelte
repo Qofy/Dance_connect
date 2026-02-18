@@ -1,6 +1,6 @@
 <script>
   import { Event } from "@/entities/Event";
-  import { Button } from "@/components/ui/Button.svelte";
+  import Button from "@/components/ui/Button.svelte";
   import { MapPin, Calendar, Users } from "lucide-svelte";
   import Layout from "@/components/Layout.svelte";
 
