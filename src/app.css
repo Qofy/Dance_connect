@@ -1,79 +1,159 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ---------- Neumorphic design tokens ---------- */
 :root {
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
+  --base: #e0e0e0;
+  --lighter: #ffffff;
+  --dark: #c8c8c8;
+  --darker: #bebebe;
+  --text-primary: #4a4a4a;
+  --text-secondary: #6a6a6a;
+  --text-muted: #8a8a8a;
 
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
+  --status-draft-bg: #d4d4d4;
+  --status-draft-text: #6a6a6a;
+  --status-sent-bg: #c8d4e8;
+  --status-sent-text: #4a6ba8;
+  --status-approved-bg: #c8d4e8;
+  --status-approved-text: #4a6ba8;
+  --status-paid-bg: #c8e8d4;
+  --status-paid-text: #4a8a6b;
+  --status-error-bg: #e8c8c8;
+  --status-error-text: #a84a4a;
 
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  --neo-primary: #0066FF;
+  --neo-secondary: #FF006E;
+  --neo-accent: #00FF66;
+  --neo-warning: #FFFF00;
+  --neo-black: #000000;
+  --neo-white: #FFFFFF;
 }
 
-a {
-  font-weight: 500;
-  color: #646cff;
-  text-decoration: inherit;
-}
-a:hover {
-  color: #535bf2;
+/* Base surface */
+html,
+body,
+#app {
+  height: 100%;
 }
 
 body {
+  background: var(--base);
+  color: var(--text-primary);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
   margin: 0;
-  display: flex;
-  place-items: center;
-  min-width: 320px;
-  min-height: 100vh;
 }
 
-h1 {
-  font-size: 3.2em;
-  line-height: 1.1;
+/* Cards / inset / buttons */
+.neumorphic-card {
+  background: var(--base);
+  border-radius: 20px;
+  box-shadow: 8px 8px 16px var(--darker), -8px -8px 16px var(--lighter);
 }
 
-.card {
-  padding: 2em;
+.neumorphic-inset {
+  background: var(--base);
+  border-radius: 15px;
+  box-shadow: inset 4px 4px 8px var(--darker), inset -4px -4px 8px var(--lighter);
 }
 
-#app {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  text-align: center;
+.neumorphic-button {
+  background: var(--base);
+  border-radius: 12px;
+  box-shadow: 4px 4px 8px var(--darker), -4px -4px 8px var(--lighter);
+  transition: all 0.2s ease;
+  border: none;
 }
 
-button {
-  border-radius: 8px;
-  border: 1px solid transparent;
-  padding: 0.6em 1.2em;
-  font-size: 1em;
-  font-weight: 500;
-  font-family: inherit;
-  background-color: #1a1a1a;
-  cursor: pointer;
-  transition: border-color 0.25s;
-}
-button:hover {
-  border-color: #646cff;
-}
-button:focus,
-button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
+.neumorphic-button:hover {
+  box-shadow: 2px 2px 4px var(--darker), -2px -2px 4px var(--lighter);
 }
 
-@media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
-    background-color: #ffffff;
-  }
-  a:hover {
-    color: #747bff;
-  }
-  button {
-    background-color: #f9f9f9;
-  }
+.neumorphic-button:active {
+  box-shadow: inset 2px 2px 4px var(--darker), inset -2px -2px 4px var(--lighter);
+}
+
+.neumorphic-nav-active {
+  box-shadow: inset 3px 3px 6px var(--darker), inset -3px -3px 6px var(--lighter);
+  background: var(--base);
+  color: var(--text-primary);
+}
+
+/* Text helpers + status labels */
+.text-primary {
+  color: var(--text-primary);
+}
+
+.text-secondary {
+  color: var(--text-secondary);
+}
+
+.text-muted {
+  color: var(--text-muted);
+}
+
+.status-draft {
+  background: var(--status-draft-bg);
+  color: var(--status-draft-text);
+}
+
+.status-sent {
+  background: var(--status-sent-bg);
+  color: var(--status-sent-text);
+}
+
+.status-approved {
+  background: var(--status-approved-bg);
+  color: var(--status-approved-text);
+}
+
+.status-paid {
+  background: var(--status-paid-bg);
+  color: var(--status-paid-text);
+}
+
+.status-overdue,
+.status-rejected,
+.status-cancelled,
+.status-expired {
+  background: var(--status-error-bg);
+  color: var(--status-error-text);
+}
+
+/* Neobrutalist design tokens */
+.neo-shadow {
+  box-shadow: 4px 4px 0px var(--neo-black);
+}
+
+.neo-border {
+  border: 3px solid var(--neo-black);
+}
+
+.neo-hover:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 6px 6px 0px var(--neo-black);
+}
+
+.neo-active {
+  transform: translate(2px, 2px);
+  box-shadow: 2px 2px 0px var(--neo-black);
+}
+
+/* Leaflet Map Styles */
+.leaflet-container {
+  height: 600px;
+  width: 100%;
+  border: 3px solid var(--neo-black);
+  box-shadow: 4px 4px 0px var(--neo-black);
+}
+
+.leaflet-popup-content-wrapper {
+  border-radius: 0 !important;
+  border: 3px solid var(--neo-black);
+}
+
+.leaflet-popup-tip {
+  border-top-color: var(--neo-black) !important;
 }
