@@ -5,6 +5,9 @@
   import apiClient from '@/integrations/Core';
   import Layout from '@/components/Layout.svelte';
 
+  let _goto;
+  goto.subscribe((fn) => (_goto = fn));
+
   let formData = $state({
     name: '',
     email: '',
@@ -30,7 +33,7 @@
       const response = await apiClient.put(`/users/${user.id}`, formData);
       localStorage.setItem('user', JSON.stringify(response));
       alert('Profile updated successfully!');
-      goto('/profile');
+      _goto('/profile');
     } catch (error) {
       alert('Failed to update profile. Please try again.');
     }
@@ -86,7 +89,7 @@
 
           <Button
             type="button"
-            onclick={() => goto('/profile')}
+            onclick={() => _goto('/profile')}
             class="flex-1 bg-gray-600 text-white font-bold"
           >
             CANCEL

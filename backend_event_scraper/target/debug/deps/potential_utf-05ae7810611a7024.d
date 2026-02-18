@@ -1,0 +1,9 @@
+/Users/kofisafoagyekum/Desktop/internship/20260217_kof_kofi_task_097/20260217_task/202502_danceconnect_svelte_v061/backend_event_scraper/target/debug/deps/potential_utf-05ae7810611a7024.d: /Users/kofisafoagyekum/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/potential_utf-0.1.4/src/lib.rs /Users/kofisafoagyekum/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/potential_utf-0.1.4/src/uchar.rs /Users/kofisafoagyekum/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/potential_utf-0.1.4/src/ustr.rs
+
+/Users/kofisafoagyekum/Desktop/internship/20260217_kof_kofi_task_097/20260217_task/202502_danceconnect_svelte_v061/backend_event_scraper/target/debug/deps/libpotential_utf-05ae7810611a7024.rlib: /Users/kofisafoagyekum/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/potential_utf-0.1.4/src/lib.rs /Users/kofisafoagyekum/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/potential_utf-0.1.4/src/uchar.rs /Users/kofisafoagyekum/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/potential_utf-0.1.4/src/ustr.rs
+
+/Users/kofisafoagyekum/Desktop/internship/20260217_kof_kofi_task_097/20260217_task/202502_danceconnect_svelte_v061/backend_event_scraper/target/debug/deps/libpotential_utf-05ae7810611a7024.rmeta: /Users/kofisafoagyekum/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/potential_utf-0.1.4/src/lib.rs /Users/kofisafoagyekum/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/potential_utf-0.1.4/src/uchar.rs /Users/kofisafoagyekum/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/potential_utf-0.1.4/src/ustr.rs
+
+/Users/kofisafoagyekum/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/potential_utf-0.1.4/src/lib.rs:
+/Users/kofisafoagyekum/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/potential_utf-0.1.4/src/uchar.rs:
+/Users/kofisafoagyekum/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/potential_utf-0.1.4/src/ustr.rs:

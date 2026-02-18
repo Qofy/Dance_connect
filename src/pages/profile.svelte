@@ -9,6 +9,9 @@
   import { createPageUrl } from "@/utils";
   import Layout from "@/components/Layout.svelte";
 
+  let _goto;
+  goto.subscribe((fn) => (_goto = fn));
+
   let user = $state(null);
   let createdEvents = $state([]);
   let registeredEvents = $state([]);
@@ -54,7 +57,7 @@
     }
     localStorage.removeItem('token');
     localStorage.removeItem('user');
-    goto('/login');
+    _goto('/login');
   }
 </script>
 
@@ -88,7 +91,7 @@
               </div>
             </div>
             <Button
-              onclick={() => goto('/edit-profile')}
+              onclick={() => _goto('/edit-profile')}
               class="bg-white text-black neo-border neo-shadow neo-hover font-bold"
             >
               <Edit class="w-4 h-4 mr-2" /> EDIT PROFILE

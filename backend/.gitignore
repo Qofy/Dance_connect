@@ -1,0 +1,39 @@
+# Rust
+/target/
+Cargo.lock
+
+# Database
+mitote_v026_bike_connect_backend.db/
+mitote_v026_bike_connect_backend_test.db
+mitote_v026_bike_connect_backend_test_*.db
+*.db
+
+# Logs
+*.log
+
+# IDE
+.idea/
+
+# OS
+.DS_Store
+Thumbs.dbmitote_v026_bike_connect_backend
+mitote_v026_bike_connect_backend
+mitote_v026_bike_connect_backend_noauth
+backend.tar.gz
+mitote_v026_bike_connect_backend_fedora_42__64
+backend.tar.gz
+.klirr_data_home/
+invoices/
+klirr_data/
+mitote_v026_bike_connect_backend_data/snap.*
+backend.tar.gz
+:memory:
+/exports
+/invoices
+/storage
+/uploads
+archives
+mitote_v026_bike_connect_backend_data.corrupt*
+mitote_v026_bike_connect_backend_fedora_42__64
+target
+mitote_v026_bike_connect_backend_data

@@ -2,9 +2,9 @@
   import { goto } from '@roxi/routify';
 
   // Redirect to login on load
-  $effect(() => {
-    goto('/login');
-  });
+  let _goto;
+  goto.subscribe((fn) => (_goto = fn));
+  _goto('/login');
 </script>
 
 <!-- Index page redirects to login -->

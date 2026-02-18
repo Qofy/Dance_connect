@@ -9,6 +9,9 @@
   import DanceStylePicker from "@/components/forms/DanceStylePicker.svelte";
   import Layout from "@/components/Layout.svelte";
 
+  let _goto;
+  goto.subscribe((fn) => (_goto = fn));
+
   let formData = $state({
     title: "",
     description: "",
@@ -44,7 +47,7 @@
 
       await Event.create(eventData);
       alert("Event created successfully!");
-      goto('/dashboard');
+      _goto('/dashboard');
     } catch (error) {
       console.error("Failed to create event:", error);
       alert("Failed to create event. Please try again.");
@@ -164,7 +167,7 @@
           </Button>
           <Button
             type="button"
-            onclick={() => goto('/dashboard')}
+            onclick={() => _goto('/dashboard')}
             class="flex-1 bg-gray-600 text-white neo-border neo-shadow font-bold"
           >
             CANCEL

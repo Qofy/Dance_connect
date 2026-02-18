@@ -4,6 +4,9 @@
   import Input from '@/components/ui/Input.svelte';
   import apiClient from '@/integrations/Core';
 
+  let _goto;
+  goto.subscribe((fn) => (_goto = fn));
+
   let formData = $state({
     email: '',
     password: ''
@@ -18,7 +21,7 @@
       const response = await apiClient.post('/login', formData);
       localStorage.setItem('token', response.token);
       localStorage.setItem('user', JSON.stringify(response.user));
-      goto('/dashboard');
+      _goto('/dashboard');
     } catch (error) {
       alert('Login failed. Please check your credentials.');
     }
