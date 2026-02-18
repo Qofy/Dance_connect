@@ -1,7 +1,7 @@
 <script>
   import { goto } from '@roxi/routify';
-  import { Button } from '@/components/ui/Button.svelte';
-  import { Input } from '@/components/ui/Input.svelte';
+  import Button from '@/components/ui/Button.svelte';
+  import Input from '@/components/ui/Input.svelte';
   import apiClient from '@/integrations/Core';
 
   let formData = $state({

@@ -1,5 +1,5 @@
 <script>
-  import { page } from '@roxi/routify';
+  import { url } from '@roxi/routify';
   import { Calendar, Map, User, Plus, Home, Bug, Hammer, Sun } from "lucide-svelte";
   import { createPageUrl } from "@/utils";
   import { UploadFile } from "@/integrations/Core";
@@ -20,6 +20,8 @@
     { title: "Profile", url: createPageUrl("Profile"), icon: User },
     { title: "Create Event", url: createPageUrl("CreateEvent"), icon: Plus, creatorOnly: true },
   ];
+
+  let currentUrl = $derived($url);
 
   async function handleReportClick(type) {
     const canvas = document.createElement('canvas');
@@ -77,7 +79,7 @@
             <a
               href={item.url}
               class={`px-4 py-2 font-bold neo-border transition-all neo-hover ${
-                $page.path === item.url
+                currentUrl === item.url
                   ? "bg-blue-600 text-white"
                   : "bg-white text-black hover:bg-blue-600 hover:text-white"
               }`}
@@ -131,7 +133,7 @@
         <a
           href={item.url}
           class={`p-3 neo-border flex flex-col items-center gap-1 text-xs font-bold transition-all ${
-            $page.path === item.url
+            currentUrl === item.url
               ? "bg-blue-600 text-white"
               : "bg-white text-black"
           }`}
