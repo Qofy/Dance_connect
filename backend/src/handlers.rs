@@ -7,7 +7,7 @@ use uuid::Uuid;
 use chrono::Utc;
 
 use crate::{models::*, AppState};
-use crate::models::{LoginRequest, LoginResponse, RegisterRequest, RemoteTokenResponse, UpdateUserRequest};
+use crate::models::{LoginRequest, LoginResponse, RegisterRequest, RemoteTokenResponse, UpdateUserRequest, UpdateEventRequest};
 
 pub async fn get_events(
     Query(params): Query<EventQuery>,
@@ -91,33 +91,41 @@ pub async fn create_event(
 pub async fn update_event(
     Path(id): Path<Uuid>,
     State(state): State<AppState>,
-    Json(payload): Json<CreateEventRequest>,
+    Json(payload): Json<UpdateEventRequest>,
 ) -> Result<Json<Event>, StatusCode> {
     let mut data = state.lock().unwrap();
-    
+
     match data.events.get_mut(&id) {
         Some(event) => {
-            event.title = payload.title;
-            event.description = payload.description;
-            event.event_type = payload.event_type;
-            event.dance_styles = payload.dance_styles;
-            event.start_date = payload.start_date;
-            event.end_date = payload.end_date;
-            event.venue_name = payload.venue_name;
-            event.address = payload.address;
-            event.city = payload.city;
-            event.state = payload.state;
-            event.zip_code = payload.zip_code;
-            event.latitude = payload.latitude;
-            event.longitude = payload.longitude;
-            event.ticket_price = payload.ticket_price;
-            event.max_attendees = payload.max_attendees;
-            event.image_url = payload.image_url;
-            event.website_url = payload.website_url;
-            event.contact_email = payload.contact_email;
-            event.contact_phone = payload.contact_phone;
+            if let Some(title) = payload.title { event.title = title; }
+            if let Some(description) = payload.description { event.description = Some(description); }
+            if let Some(event_type) = payload.event_type { event.event_type = Some(event_type); }
+            if let Some(dance_styles) = payload.dance_styles { event.dance_styles = dance_styles; }
+            if let Some(start_date) = payload.start_date { event.start_date = start_date; }
+            if let Some(end_date) = payload.end_date { event.end_date = Some(end_date); }
+            if let Some(venue_name) = payload.venue_name { event.venue_name = Some(venue_name); }
+            if let Some(address) = payload.address { event.address = Some(address); }
+            if let Some(city) = payload.city { event.city = city; }
+            if let Some(state_val) = payload.state { event.state = state_val; }
+            if let Some(zip_code) = payload.zip_code { event.zip_code = Some(zip_code); }
+            if payload.latitude.is_some() { event.latitude = payload.latitude; }
+            if payload.longitude.is_some() { event.longitude = payload.longitude; }
+            if payload.ticket_price.is_some() { event.ticket_price = payload.ticket_price; }
+            if payload.max_attendees.is_some() { event.max_attendees = payload.max_attendees; }
+            if let Some(image_url) = payload.image_url { event.image_url = Some(image_url); }
+            if let Some(website_url) = payload.website_url { event.website_url = Some(website_url); }
+            if let Some(contact_email) = payload.contact_email { event.contact_email = Some(contact_email); }
+            if let Some(contact_phone) = payload.contact_phone { event.contact_phone = Some(contact_phone); }
+            if let Some(status_str) = payload.status {
+                event.status = match status_str.as_str() {
+                    "draft"     => EventStatus::Draft,
+                    "cancelled" => EventStatus::Cancelled,
+                    "completed" => EventStatus::Completed,
+                    _           => EventStatus::Public,
+                };
+            }
             event.updated_at = Utc::now();
-            
+
             Ok(Json(event.clone()))
         }
         None => Err(StatusCode::NOT_FOUND),
@@ -258,6 +266,22 @@ pub async fn update_user(
             }
 
             Ok(Json(updated_user))
+        }
+        None => Err(StatusCode::NOT_FOUND),
+    }
+}
+
+pub async fn delete_user(
+    Path(id): Path<Uuid>,
+    State(state): State<AppState>,
+) -> Result<StatusCode, StatusCode> {
+    let mut data = state.lock().unwrap();
+    match data.users.remove(&id) {
+        Some(user) => {
+            let key = format!("user:{}", user.id);
+            let _ = data.db.remove(key.as_bytes());
+            let _ = data.db.flush();
+            Ok(StatusCode::NO_CONTENT)
         }
         None => Err(StatusCode::NOT_FOUND),
     }

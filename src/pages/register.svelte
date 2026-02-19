@@ -22,13 +22,13 @@
   const roleOptions = [
     { value: 'dancer',  label: 'DANCER',  description: 'I want to join events' },
     { value: 'creator', label: 'CREATOR', description: 'I organize events' },
-    { value: 'both',    label: 'BOTH',    description: 'I dance and organize' }
+    { value: 'both',    label: 'BOTH',    description: 'I dance and organize' },
+    { value: 'admin',   label: 'ADMIN',   description: 'Platform administrator' }
   ];
 
   function selectRole(value) {
     userType = value;
-    // API only accepts dancer / creator; use creator as superset for "both"
-    formData.role = value === 'both' ? 'creator' : value;
+    formData.role = value;
   }
 
   async function handleSubmit(e) {
@@ -49,8 +49,10 @@
       localStorage.setItem('token', response.token);
       localStorage.setItem('user', JSON.stringify(user));
 
-      // Dancers & "both" go through onboarding; creators go straight to dashboard
-      if (userType === 'dancer' || userType === 'both') {
+      // Route based on role
+      if (userType === 'admin') {
+        _goto('/admin');
+      } else if (userType === 'dancer' || userType === 'both') {
         _goto('/onboarding/dance-styles');
       } else {
         _goto('/dashboard');

@@ -139,6 +139,31 @@ pub struct UpdateUserRequest {
     pub longitude: Option<f64>,
 }
 
+// Used for PUT /events/:id — all fields optional, includes status
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct UpdateEventRequest {
+    pub title: Option<String>,
+    pub description: Option<String>,
+    pub event_type: Option<EventType>,
+    pub dance_styles: Option<Vec<String>>,
+    pub start_date: Option<NaiveDate>,
+    pub end_date: Option<NaiveDate>,
+    pub venue_name: Option<String>,
+    pub address: Option<String>,
+    pub city: Option<String>,
+    pub state: Option<String>,
+    pub zip_code: Option<String>,
+    pub latitude: Option<f64>,
+    pub longitude: Option<f64>,
+    pub ticket_price: Option<f64>,
+    pub max_attendees: Option<u32>,
+    pub image_url: Option<String>,
+    pub website_url: Option<String>,
+    pub contact_email: Option<String>,
+    pub contact_phone: Option<String>,
+    pub status: Option<String>,
+}
+
 // Used for POST /users (admin create)
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct CreateUserRequest {
