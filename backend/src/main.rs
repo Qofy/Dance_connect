@@ -134,23 +134,37 @@ impl AppData {
         let admin_user = User {
             id: Uuid::new_v4(),
             email: "admin@danceconnect.com".to_string(),
-            name: "Admin User".to_string(),
+            full_name: "Admin User".to_string(),
             password_hash: "admin123".to_string(),
             role: models::UserRole::Admin,
+            user_type: "admin".to_string(),
+            dance_styles: vec![],
+            city: None,
+            state: None,
+            zip_code: None,
+            latitude: None,
+            longitude: None,
             created_at: Utc::now(),
             updated_at: Utc::now(),
         };
-        
+
         let demo_user = User {
             id: Uuid::new_v4(),
             email: "demo@danceconnect.com".to_string(),
-            name: "Demo User".to_string(),
+            full_name: "Demo Dancer".to_string(),
             password_hash: "demo123".to_string(),
             role: models::UserRole::Dancer,
+            user_type: "dancer".to_string(),
+            dance_styles: vec!["salsa".to_string(), "bachata".to_string()],
+            city: Some("San Francisco".to_string()),
+            state: Some("CA".to_string()),
+            zip_code: Some("94105".to_string()),
+            latitude: Some(37.7749),
+            longitude: Some(-122.4194),
             created_at: Utc::now(),
             updated_at: Utc::now(),
         };
-        
+
         self.save_user(&admin_user);
         self.save_user(&demo_user);
         self.users.insert(admin_user.id, admin_user);

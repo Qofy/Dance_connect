@@ -1,13 +1,13 @@
 use axum::{
     extract::{Path, Query, State, Multipart},
-    http::StatusCode,
+    http::{StatusCode, HeaderMap},
     response::Json,
 };
 use uuid::Uuid;
 use chrono::Utc;
 
 use crate::{models::*, AppState};
-use crate::models::{LoginRequest, LoginResponse, RegisterRequest, RemoteTokenResponse};
+use crate::models::{LoginRequest, LoginResponse, RegisterRequest, RemoteTokenResponse, UpdateUserRequest};
 
 pub async fn get_events(
     Query(params): Query<EventQuery>,
@@ -152,13 +152,20 @@ pub async fn get_user(
     }
 }
 
-pub async fn get_current_user(State(state): State<AppState>) -> Result<Json<User>, StatusCode> {
+pub async fn get_current_user(
+    headers: HeaderMap,
+    State(state): State<AppState>,
+) -> Result<Json<User>, StatusCode> {
+    let token = headers
+        .get("authorization")
+        .and_then(|v| v.to_str().ok())
+        .and_then(|v| v.strip_prefix("Bearer "))
+        .ok_or(StatusCode::UNAUTHORIZED)?;
+
     let data = state.lock().unwrap();
-    if let Some(user) = data.users.values().next() {
-        Ok(Json(user.clone()))
-    } else {
-        Err(StatusCode::UNAUTHORIZED)
-    }
+    let &(user_id, _) = data.tokens.get(token).ok_or(StatusCode::UNAUTHORIZED)?;
+    let user = data.users.get(&user_id).ok_or(StatusCode::NOT_FOUND)?;
+    Ok(Json(user.clone()))
 }
 
 pub async fn create_user(
@@ -167,13 +174,20 @@ pub async fn create_user(
 ) -> Result<Json<User>, StatusCode> {
     let mut data = state.lock().unwrap();
     let now = Utc::now();
-    
+
     let user = User {
         id: Uuid::new_v4(),
         email: payload.email,
-        name: payload.name,
+        full_name: payload.name,
         password_hash: "default".to_string(),
         role: payload.role,
+        user_type: "dancer".to_string(),
+        dance_styles: vec![],
+        city: None,
+        state: None,
+        zip_code: None,
+        latitude: None,
+        longitude: None,
         created_at: now,
         updated_at: now,
     };
@@ -184,7 +198,7 @@ pub async fn create_user(
         let _ = data.db.insert(key.as_bytes(), serialized);
         let _ = data.db.flush();
     }
-    
+
     data.users.insert(user.id, user.clone());
     Ok(Json(user))
 }
@@ -192,27 +206,57 @@ pub async fn create_user(
 pub async fn update_user(
     Path(id): Path<Uuid>,
     State(state): State<AppState>,
-    Json(payload): Json<CreateUserRequest>,
+    Json(payload): Json<UpdateUserRequest>,
 ) -> Result<Json<User>, StatusCode> {
     let mut data = state.lock().unwrap();
-    
-    let user_id = id;
-    match data.users.get_mut(&user_id) {
+
+    match data.users.get_mut(&id) {
         Some(user) => {
-            user.email = payload.email;
-            user.name = payload.name;
-            user.role = payload.role;
+            if let Some(name) = payload.name {
+                user.full_name = name;
+            }
+            if let Some(email) = payload.email {
+                user.email = email;
+            }
+            if let Some(role_str) = payload.role {
+                user.role = match role_str.as_str() {
+                    "admin" => UserRole::Admin,
+                    "creator" => UserRole::Creator,
+                    _ => UserRole::Dancer,
+                };
+            }
+            if let Some(ut) = payload.user_type {
+                user.user_type = ut;
+            }
+            if let Some(styles) = payload.dance_styles {
+                user.dance_styles = styles;
+            }
+            if let Some(city) = payload.city {
+                user.city = Some(city);
+            }
+            if let Some(state_val) = payload.state {
+                user.state = Some(state_val);
+            }
+            if let Some(zip) = payload.zip_code {
+                user.zip_code = Some(zip);
+            }
+            if payload.latitude.is_some() {
+                user.latitude = payload.latitude;
+            }
+            if payload.longitude.is_some() {
+                user.longitude = payload.longitude;
+            }
             user.updated_at = Utc::now();
-            
+
             let updated_user = user.clone();
-            
-            // Save to database
+
+            // Persist to sled
             let key = format!("user:{}", updated_user.id);
             if let Ok(serialized) = bincode::serialize(&updated_user) {
                 let _ = data.db.insert(key.as_bytes(), serialized);
                 let _ = data.db.flush();
             }
-            
+
             Ok(Json(updated_user))
         }
         None => Err(StatusCode::NOT_FOUND),
@@ -284,22 +328,37 @@ pub async fn register(
     Json(payload): Json<RegisterRequest>,
 ) -> Result<Json<LoginResponse>, StatusCode> {
     let mut data = state.lock().unwrap();
-    
+
     if data.users.values().any(|u| u.email == payload.email) {
         return Err(StatusCode::CONFLICT);
     }
-    
+
+    let role_str = payload.role.as_deref().unwrap_or("dancer");
+    let (role, user_type) = match role_str {
+        "admin"   => (UserRole::Admin,   "admin".to_string()),
+        "creator" => (UserRole::Creator, "creator".to_string()),
+        "both"    => (UserRole::Creator, "both".to_string()),
+        _         => (UserRole::Dancer,  "dancer".to_string()),
+    };
+
     let user = User {
         id: Uuid::new_v4(),
         email: payload.email.clone(),
-        name: payload.name.clone(),
+        full_name: payload.name.clone(),
         password_hash: payload.password.clone(),
-        role: UserRole::Dancer,
+        role,
+        user_type,
+        dance_styles: vec![],
+        city: None,
+        state: None,
+        zip_code: None,
+        latitude: None,
+        longitude: None,
         created_at: Utc::now(),
         updated_at: Utc::now(),
     };
-    
-    println!("Registering user: email={}, password={}", user.email, user.password_hash);
+
+    println!("Registering user: email={}, role={}", user.email, role_str);
     
     // Save to database
     let key = format!("user:{}", user.id);

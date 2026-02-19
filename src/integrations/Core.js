@@ -3,9 +3,11 @@ const API_BASE_URL = 'http://localhost:8061/api';
 class ApiClient {
   async request(endpoint, options = {}) {
     const url = `${API_BASE_URL}${endpoint}`;
+    const token = localStorage.getItem('token');
     const config = {
       headers: {
         'Content-Type': 'application/json',
+        ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
         ...options.headers,
       },
       ...options,

@@ -174,6 +174,63 @@ export const routes = {
     },
     {
       "meta": {},
+      "id": "_default_onboarding",
+      "name": "onboarding",
+      "module": false,
+      "file": {
+        "path": "src/pages/onboarding",
+        "dir": "src/pages",
+        "base": "onboarding",
+        "ext": "",
+        "name": "onboarding"
+      },
+      "children": [
+        {
+          "meta": {},
+          "id": "_default_onboarding_dance_styles_svelte",
+          "name": "dance-styles",
+          "file": {
+            "path": "src/pages/onboarding/dance-styles.svelte",
+            "dir": "src/pages/onboarding",
+            "base": "dance-styles.svelte",
+            "ext": ".svelte",
+            "name": "dance-styles"
+          },
+          "asyncModule": () => import('../src/pages/onboarding/dance-styles.svelte'),
+          "children": []
+        },
+        {
+          "meta": {},
+          "id": "_default_onboarding_location_svelte",
+          "name": "location",
+          "file": {
+            "path": "src/pages/onboarding/location.svelte",
+            "dir": "src/pages/onboarding",
+            "base": "location.svelte",
+            "ext": ".svelte",
+            "name": "location"
+          },
+          "asyncModule": () => import('../src/pages/onboarding/location.svelte'),
+          "children": []
+        },
+        {
+          "meta": {},
+          "id": "_default_onboarding_welcome_svelte",
+          "name": "welcome",
+          "file": {
+            "path": "src/pages/onboarding/welcome.svelte",
+            "dir": "src/pages/onboarding",
+            "base": "welcome.svelte",
+            "ext": ".svelte",
+            "name": "welcome"
+          },
+          "asyncModule": () => import('../src/pages/onboarding/welcome.svelte'),
+          "children": []
+        }
+      ]
+    },
+    {
+      "meta": {},
       "id": "_default_profile_svelte",
       "name": "profile",
       "file": {

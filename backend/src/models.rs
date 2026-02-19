@@ -66,6 +66,7 @@ pub struct RegisterRequest {
     pub email: String,
     pub password: String,
     pub name: String,
+    pub role: Option<String>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -101,9 +102,16 @@ pub struct CreateEventRequest {
 pub struct User {
     pub id: Uuid,
     pub email: String,
-    pub name: String,
+    pub full_name: String,
     pub password_hash: String,
     pub role: UserRole,
+    pub user_type: String,         // "dancer" | "creator" | "both"
+    pub dance_styles: Vec<String>,
+    pub city: Option<String>,
+    pub state: Option<String>,
+    pub zip_code: Option<String>,
+    pub latitude: Option<f64>,
+    pub longitude: Option<f64>,
     pub created_at: DateTime<Utc>,
     pub updated_at: DateTime<Utc>,
 }
@@ -116,6 +124,22 @@ pub enum UserRole {
     Dancer,
 }
 
+// Used for PUT /users/:id — all fields optional for partial update
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct UpdateUserRequest {
+    pub name: Option<String>,
+    pub email: Option<String>,
+    pub role: Option<String>,
+    pub user_type: Option<String>,
+    pub dance_styles: Option<Vec<String>>,
+    pub city: Option<String>,
+    pub state: Option<String>,
+    pub zip_code: Option<String>,
+    pub latitude: Option<f64>,
+    pub longitude: Option<f64>,
+}
+
+// Used for POST /users (admin create)
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct CreateUserRequest {
     pub email: String,
