@@ -30,6 +30,20 @@ export const routes = {
       "children": [
         {
           "meta": {},
+          "id": "_default_admin_analytics_svelte",
+          "name": "analytics",
+          "file": {
+            "path": "src/pages/admin/analytics.svelte",
+            "dir": "src/pages/admin",
+            "base": "analytics.svelte",
+            "ext": ".svelte",
+            "name": "analytics"
+          },
+          "asyncModule": () => import('../src/pages/admin/analytics.svelte'),
+          "children": []
+        },
+        {
+          "meta": {},
           "id": "_default_admin_events_svelte",
           "name": "events",
           "file": {
@@ -40,6 +54,36 @@ export const routes = {
             "name": "events"
           },
           "asyncModule": () => import('../src/pages/admin/events.svelte'),
+          "children": []
+        },
+        {
+          "meta": {
+            "isDefault": true
+          },
+          "id": "_default_admin_index_svelte",
+          "name": "index",
+          "file": {
+            "path": "src/pages/admin/index.svelte",
+            "dir": "src/pages/admin",
+            "base": "index.svelte",
+            "ext": ".svelte",
+            "name": "index"
+          },
+          "asyncModule": () => import('../src/pages/admin/index.svelte'),
+          "children": []
+        },
+        {
+          "meta": {},
+          "id": "_default_admin_settings_svelte",
+          "name": "settings",
+          "file": {
+            "path": "src/pages/admin/settings.svelte",
+            "dir": "src/pages/admin",
+            "base": "settings.svelte",
+            "ext": ".svelte",
+            "name": "settings"
+          },
+          "asyncModule": () => import('../src/pages/admin/settings.svelte'),
           "children": []
         },
         {

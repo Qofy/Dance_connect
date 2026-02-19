@@ -272,3 +272,23 @@ creating a Dancer User Flow Spec for login/register and first experience:
        ↓               ↓               ↓          ↓        ↓          ↓
     Email+Pass    Styles+Location   Welcome!   Search   Confirm   My Events
     (2 mins)      (2 mins)           Page    Filter    Event     View Regs
+
+# Implemented#
+What changed / was created
+register.svelte — Replaced the role dropdown with styled radio buttons (DANCER / CREATOR / BOTH). After successful registration, dancers and "both" users are redirected to the onboarding flow instead of the dashboard. Better error messages for duplicate email and weak password.
+
+onboarding/dance-styles.svelte (new) — Step 2. Uses the existing DanceStylePicker component, enforces max 5 selections, shows a live preview of selected styles. SKIP or NEXT both advance to location step, saving selections to localStorage.
+
+onboarding/location.svelte (new) — Step 3. Geolocation "DETECT MY LOCATION" button with a confirm banner. Manual city/state/zip fallback. SKIP sends dancer directly to welcome.
+
+onboarding/welcome.svelte (new) — Step 4. Shows a profile summary card (name, role, styles, location). On "GO TO DASHBOARD", saves dance styles + location to the backend via PUT /users/{id}, sets is_new_dancer in localStorage, then redirects.
+
+dashboard.svelte — Dancer-personalized experience:
+
+Green welcome banner on first arrival (dismissible)
+Hero title says WELCOME, [NAME]! for new dancers
+Style chips in the hero auto-populated from dancer's saved styles — click one to instantly filter
+Style dropdown marks dancer's own styles with ★
+Active filter chip with a clear button
+"No events in [city]" empty state with a "Browse national events" escape hatch
+edit-profile.svelte — Added a full Dance Styles section (using DanceStylePicker) and a Location section (city/state/zip). Both sections persist to the API on save.

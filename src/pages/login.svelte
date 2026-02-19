@@ -21,7 +21,12 @@
       const response = await apiClient.post('/login', formData);
       localStorage.setItem('token', response.token);
       localStorage.setItem('user', JSON.stringify(response.user));
-      _goto('/dashboard');
+      // Admins go to admin control panel; everyone else to dashboard
+      if (response.user.role === 'admin') {
+        _goto('/admin');
+      } else {
+        _goto('/dashboard');
+      }
     } catch (error) {
       alert('Login failed. Please check your credentials.');
     }

@@ -492,3 +492,17 @@ Here's the Admin User Flow Spec for DanceConnect:
 
   ---
   
+  ### Implementation####
+  Login redirect — After login, response.user.role === 'admin' → /admin, everyone else → /dashboard
+
+AdminLayout.svelte (new) — Black header with ADMIN badge, collapsible left sidebar (mobile hamburger + desktop always-visible), admin guard that redirects non-admins away, logout button, "← BACK TO SITE" link
+
+/admin/index.svelte (new) — Control panel dashboard: 4 stat cards (users, events, cities, registrations), system health checks, recent users table, recent events table with status chips
+
+/admin/events.svelte (rebuilt) — Full table with search + status + city filters; per-row actions: Edit (modal), Registrations (modal with CSV export), LIVE/DRAFT toggle, SUSPEND, Delete. Edit modal covers all fields including status.
+
+/admin/users.svelte (rebuilt) — Table with search + role + type filters, D/C/B/— type column, registration count per user. Click any row opens a detail modal: change Role (Admin/Creator/Dancer) + User Type (Dancer/Creator/Both), shows dance styles + location, Save + Delete User.
+
+/admin/analytics.svelte (new) — 6 KPI cards (users, events, registrations, avg events/user, revenue, avg ticket price), bar-chart-style breakdowns for dance styles and cities, user type doughnut-style summary, top 5 events by attendance with #1/#2/#3 medals.
+
+/admin/settings.svelte (new) — Platform config (site name, support email, help URL, maintenance mode toggle), permissions checkboxes (allow signups/event creation/email verification/event limits), notification preferences, Save (persists to localStorage) + Reset to defaults.
