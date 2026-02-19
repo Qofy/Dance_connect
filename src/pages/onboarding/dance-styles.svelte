@@ -11,7 +11,7 @@
   function toggleStyle(style) {
     if (selectedStyles.includes(style)) {
       selectedStyles = selectedStyles.filter(s => s !== style);
-    } else if (selectedStyles.length < 5) {
+    } else if (selectedStyles.length < 8) {
       selectedStyles = [...selectedStyles, style];
     }
   }
