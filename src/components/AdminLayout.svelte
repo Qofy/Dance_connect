@@ -1,11 +1,18 @@
 <script>
-  import { goto } from '@roxi/routify';
+  import { goto, url } from '@roxi/routify';
   import { LayoutDashboard, Calendar, Users, BarChart2, Settings, LogOut, Shield, Menu, X } from 'lucide-svelte';
 
   let { children } = $props();
 
   let _goto;
   goto.subscribe((fn) => (_goto = fn));
+
+  let currentPath = '';
+  url.subscribe(u => {
+    // routify url store may provide an object with .path or a string
+    const p = u && u.path ? u.path : String(u || window.location.pathname);
+    currentPath = String(p).replace(/\/$/, '');
+  });
 
   let sidebarOpen = $state(false);
 
@@ -39,17 +46,12 @@
 
   function isActive(href) {
     if (typeof window === 'undefined') return false;
-    const path = window.location.pathname.replace(/\/$/, '');
+    const path = currentPath || window.location.pathname.replace(/\/$/, '');
     const h = String(href).replace(/\/$/, '');
 
-    // Exact match
     if (path === h) return true;
-
-    // If href is not a prefix of the path, it's not active
     if (!path.startsWith(h)) return false;
 
-    // Among all nav items that are prefixes of the path, only the longest (most specific)
-    // should be considered active. This avoids multiple items getting the active class.
     return !navItems.some(item => {
       const ih = String(item.href).replace(/\/$/, '');
       return ih.length > h.length && path.startsWith(ih);
@@ -108,7 +110,7 @@
         {#each navItems as { href, label, Icon } (href)}
           <a
             href={href}
-            onclick={() => sidebarOpen = false}
+            onclick={(e) => { e.preventDefault(); sidebarOpen = false; _goto(href); }}
             class={`flex items-center gap-3 px-3 py-2.5 font-bold text-sm transition-all ${
               isActive(href)
                 ? 'bg-red-600 text-white neo-border'

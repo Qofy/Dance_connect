@@ -46,7 +46,7 @@
       <div class="text-center mb-8">
         <h1 class="text-3xl font-black transform rotate-1">SELECT YOUR DANCE STYLES</h1>
         <p class="font-bold text-gray-600 mt-2">
-          Pick at least 1 <span class="text-gray-400">(optional, max 5)</span>
+          Pick at least 1 <span class="text-gray-400">(optional, max 8)</span>
         </p>
       </div>
 

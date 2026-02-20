@@ -1,159 +1,178 @@
 <script>
-  import { url } from '@roxi/routify';
-  import { Calendar, Map, User, Plus, Home, Bug, Hammer, Sun } from "lucide-svelte";
+  import { url, goto } from '@roxi/routify';
+  import { Calendar, MapPin, User, LogOut, ChevronDown } from "lucide-svelte";
   import { createPageUrl } from "@/utils";
-  import { UploadFile } from "@/integrations/Core";
-  import BugReportModal from "./modals/BugReportModal.svelte";
-  import WishRequestModal from "./modals/WishRequestModal.svelte";
-  import PersonaSwitcher from "./shared/PersonaSwitcher.svelte";
 
   let { children } = $props();
 
-  let bugModalState = $state({ isOpen: false, screenshotUrl: null });
-  let wishModalState = $state({ isOpen: false, screenshotUrl: null });
+  let user = $state(null);
+  let userMenuOpen = $state(false);
 
-  const navigationItems = [
-    { title: "Dashboard", url: createPageUrl("Dashboard"), icon: Home },
-    { title: "Today", url: createPageUrl("Today"), icon: Sun },
-    { title: "Calendar", url: createPageUrl("Calendar"), icon: Calendar },
-    { title: "Map", url: createPageUrl("MapView"), icon: Map },
-    { title: "Profile", url: createPageUrl("Profile"), icon: User },
-    { title: "Create Event", url: createPageUrl("CreateEvent"), icon: Plus, creatorOnly: true },
+  let _goto;
+  goto.subscribe((fn) => (_goto = fn));
+
+  $effect(() => {
+    const stored = localStorage.getItem('user');
+    if (stored) {
+      try { user = JSON.parse(stored); } catch { user = null; }
+    }
+  });
+
+  const navItems = [
+    { label: 'EVENTS',  href: '/dashboard',             icon: Calendar },
+    { label: 'NEAR ME', href: createPageUrl("MapView"),  icon: MapPin },
   ];
+
+  function logout() {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    userMenuOpen = false;
+    _goto('/login');
+  }
 
   let currentUrl = $derived($url);
 
-  async function handleReportClick(type) {
-    const canvas = document.createElement('canvas');
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
-    const ctx = canvas.getContext('2d');
-    ctx.fillStyle = '#f0f0f0';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-    ctx.fillStyle = '#000';
-    ctx.font = '20px Arial';
-    ctx.fillText(`Screenshot for ${type} report at ${new Date().toLocaleTimeString()}`, 50, 100);
-
-    canvas.toBlob(async (blob) => {
-      try {
-        const file = new File([blob], `${type}-screenshot-${Date.now()}.png`, { type: 'image/png' });
-        const { file_url } = await UploadFile({ file });
-
-        if (type === 'bug') {
-          bugModalState = { isOpen: true, screenshotUrl: file_url };
-        } else {
-          wishModalState = { isOpen: true, screenshotUrl: file_url };
-        }
-      } catch (error) {
-        console.error('Screenshot upload failed:', error);
-        if (type === 'bug') bugModalState = { isOpen: true, screenshotUrl: null };
-        else wishModalState = { isOpen: true, screenshotUrl: null };
-      }
-    });
+  function initials(name) {
+    if (!name) return '?';
+    return name.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
   }
 </script>
 
 <div class="min-h-screen bg-white">
-  <!-- Header -->
-  <header class="neo-border border-b-3 bg-white p-4 sticky top-0 z-40">
-    <div class="max-w-7xl mx-auto flex items-center justify-between">
-      <a href={createPageUrl("Dashboard")} class="flex items-center gap-3">
-        <div class="w-12 h-12 bg-gradient-to-br from-blue-600 to-pink-600 neo-border neo-shadow flex items-center justify-center transform -rotate-2">
-          <span class="text-white font-black text-xl">DC</span>
+  <!-- ── Public Header ── -->
+  <header class="bg-white neo-border border-b-4 sticky top-0 z-40">
+    <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between gap-4">
+
+      <!-- Logo -->
+      <a href="/dashboard" class="flex items-center gap-3 flex-shrink-0">
+        <div class="w-11 h-11 bg-gradient-to-br from-blue-600 to-pink-600 neo-border neo-shadow flex items-center justify-center transform -rotate-2">
+          <span class="text-white font-black text-lg">DC</span>
         </div>
-        <div>
-          <h1 class="text-2xl font-black text-black transform rotate-1">
-            DANCECONNECT
-          </h1>
-          <p class="text-sm font-bold text-gray-600 transform -rotate-1">
-            BRUTAL DANCE EVENTS
-          </p>
+        <div class="hidden sm:block leading-tight">
+          <p class="text-xl font-black text-black">DANCECONNECT</p>
+          <p class="text-xs font-bold text-gray-500 -mt-0.5">FIND YOUR RHYTHM</p>
         </div>
       </a>
 
-      <div class="flex items-center gap-4">
-        <PersonaSwitcher />
-        <!-- Desktop Navigation -->
-        <nav class="hidden md:flex gap-2">
-          {#each navigationItems as item (item.title)}
-            <a
-              href={item.url}
-              class={`px-4 py-2 font-bold neo-border transition-all neo-hover ${
-                currentUrl === item.url
-                  ? "bg-blue-600 text-white"
-                  : "bg-white text-black hover:bg-blue-600 hover:text-white"
-              }`}
-            >
-              <div class="flex items-center gap-2">
-                <svelte:component this={item.icon} class="w-5 h-5" />
-                {item.title}
-              </div>
-            </a>
-          {/each}
-        </nav>
+      <!-- Desktop nav -->
+      <nav class="hidden md:flex items-center gap-2">
+        {#each navItems as item (item.label)}
+          <a
+            href={item.href}
+            class={`flex items-center gap-2 px-4 py-2 neo-border font-bold transition-all ${
+              currentUrl === item.href
+                ? 'bg-blue-600 text-white neo-shadow'
+                : 'bg-white text-black hover:bg-blue-600 hover:text-white'
+            }`}
+          >
+            <svelte:component this={item.icon} class="w-4 h-4" />
+            {item.label}
+          </a>
+        {/each}
+      </nav>
 
-        <!-- Mobile Menu Button -->
-        <button class="md:hidden neo-border p-2 bg-white neo-shadow neo-hover">
-          <User class="w-6 h-6" />
-        </button>
+      <!-- Right: user section -->
+      <div class="flex items-center gap-2">
+        {#if user}
+          <!-- Avatar + dropdown -->
+          <div class="relative">
+            <button
+              onclick={() => (userMenuOpen = !userMenuOpen)}
+              class="flex items-center gap-2 px-3 py-2 neo-border bg-white font-bold hover:bg-gray-100 transition-all"
+            >
+              <span class="w-8 h-8 bg-blue-600 text-white font-black text-sm flex items-center justify-center flex-shrink-0">
+                {initials(user.full_name || user.email)}
+              </span>
+              <span class="hidden sm:block max-w-32 truncate text-sm font-bold">
+                {user.full_name || user.email}
+              </span>
+              <ChevronDown class="w-4 h-4 flex-shrink-0" />
+            </button>
+
+            {#if userMenuOpen}
+              <button
+                class="fixed inset-0 z-40"
+                onclick={() => (userMenuOpen = false)}
+                aria-label="Close menu"
+              ></button>
+              <div class="absolute right-0 top-full mt-1 w-48 bg-white neo-border neo-shadow z-50">
+                <a
+                  href="/profile"
+                  onclick={() => (userMenuOpen = false)}
+                  class="flex items-center gap-2 px-4 py-3 font-bold border-b-2 border-black hover:bg-blue-600 hover:text-white transition-all"
+                >
+                  <User class="w-4 h-4" />
+                  MY PROFILE
+                </a>
+                <button
+                  onclick={logout}
+                  class="w-full flex items-center gap-2 px-4 py-3 font-bold text-left hover:bg-red-600 hover:text-white transition-all"
+                >
+                  <LogOut class="w-4 h-4" />
+                  LOG OUT
+                </button>
+              </div>
+            {/if}
+          </div>
+        {:else}
+          <a href="/login"
+            class="px-4 py-2 neo-border font-bold bg-white text-black hover:bg-gray-100 transition-all hidden sm:block">
+            LOG IN
+          </a>
+          <a href="/register"
+            class="px-4 py-2 neo-border neo-shadow font-bold bg-blue-600 text-white hover:bg-blue-700 transition-all">
+            SIGN UP
+          </a>
+        {/if}
       </div>
     </div>
   </header>
 
   <!-- Main Content -->
-  <main class="flex-1">
+  <main>
     {@render children()}
   </main>
 
-  <!-- Floating Action Buttons -->
-  <div class="fixed bottom-24 md:bottom-6 right-6 flex flex-col gap-4 z-50">
-    <!-- Bug Report Button -->
-    <button
-      onclick={() => handleReportClick('bug')}
-      class="w-16 h-16 bg-red-500 text-white neo-border neo-shadow neo-hover font-black text-xl transform rotate-3"
-      title="Report Bug"
-    >
-      <Bug class="w-6 h-6 mx-auto" />
-    </button>
-
-    <!-- Wish Request Button -->
-    <button
-      onclick={() => handleReportClick('wish')}
-      class="w-16 h-16 bg-yellow-400 text-black neo-border neo-shadow neo-hover font-black text-xl transform -rotate-3"
-      title="Make a Wish"
-    >
-      <Hammer class="w-6 h-6 mx-auto" />
-    </button>
-  </div>
-
-  <!-- Mobile Navigation -->
-  <nav class="md:hidden fixed bottom-0 left-0 right-0 bg-white neo-border border-t-3 p-2 z-50">
+  <!-- Mobile Bottom Nav -->
+  <nav class="md:hidden fixed bottom-0 left-0 right-0 bg-white neo-border border-t-4 p-2 z-50">
     <div class="flex justify-around">
-      {#each navigationItems.slice(0, 4) as item (item.title)}
+      <a
+        href="/dashboard"
+        class={`flex flex-col items-center gap-1 px-6 py-2 neo-border text-xs font-bold transition-all ${
+          currentUrl === '/dashboard' ? 'bg-blue-600 text-white' : 'bg-white text-black'
+        }`}
+      >
+        <Calendar class="w-5 h-5" />
+        EVENTS
+      </a>
+      <a
+        href={createPageUrl("MapView")}
+        class={`flex flex-col items-center gap-1 px-6 py-2 neo-border text-xs font-bold transition-all ${
+          currentUrl === createPageUrl("MapView") ? 'bg-blue-600 text-white' : 'bg-white text-black'
+        }`}
+      >
+        <MapPin class="w-5 h-5" />
+        NEAR ME
+      </a>
+      {#if user}
         <a
-          href={item.url}
-          class={`p-3 neo-border flex flex-col items-center gap-1 text-xs font-bold transition-all ${
-            currentUrl === item.url
-              ? "bg-blue-600 text-white"
-              : "bg-white text-black"
+          href="/profile"
+          class={`flex flex-col items-center gap-1 px-6 py-2 neo-border text-xs font-bold transition-all ${
+            currentUrl === '/profile' ? 'bg-blue-600 text-white' : 'bg-white text-black'
           }`}
         >
-          <svelte:component this={item.icon} class="w-5 h-5" />
-          {item.title}
+          <User class="w-5 h-5" />
+          PROFILE
         </a>
-      {/each}
+      {:else}
+        <a
+          href="/login"
+          class="flex flex-col items-center gap-1 px-6 py-2 neo-border text-xs font-bold bg-white text-black"
+        >
+          <User class="w-5 h-5" />
+          LOG IN
+        </a>
+      {/if}
     </div>
   </nav>
-
-  <!-- Modals -->
-  <BugReportModal
-    isOpen={bugModalState.isOpen}
-    screenshotUrl={bugModalState.screenshotUrl}
-    onClose={() => (bugModalState = { isOpen: false, screenshotUrl: null })}
-  />
-  <WishRequestModal
-    isOpen={wishModalState.isOpen}
-    screenshotUrl={wishModalState.screenshotUrl}
-    onClose={() => (wishModalState = { isOpen: false, screenshotUrl: null })}
-  />
 </div>

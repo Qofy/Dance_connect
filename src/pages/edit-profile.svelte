@@ -97,7 +97,7 @@
         {#if formData.role === 'dancer' || formData.role === 'creator'}
           <section class="neo-border neo-shadow p-6 bg-gray-50">
             <h2 class="text-xl font-black mb-1">DANCE STYLES</h2>
-            <p class="font-bold text-gray-500 text-sm mb-4">Select up to 5 styles</p>
+            <p class="font-bold text-gray-500 text-sm mb-4">Select up to 8 styles</p>
 
             {#if formData.dance_styles.length > 0}
               <div class="mb-4 flex flex-wrap gap-2">
@@ -107,7 +107,7 @@
                   </span>
                 {/each}
                 <span class="font-bold text-gray-500 text-sm self-center">
-                  ({formData.dance_styles.length}/5)
+                  ({formData.dance_styles.length}/8)
                 </span>
               </div>
             {/if}
