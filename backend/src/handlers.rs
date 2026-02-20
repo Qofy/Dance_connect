@@ -7,7 +7,7 @@ use uuid::Uuid;
 use chrono::Utc;
 
 use crate::{models::*, AppState};
-use crate::models::{LoginRequest, LoginResponse, RegisterRequest, RemoteTokenResponse, UpdateUserRequest, UpdateEventRequest};
+use crate::models::{LoginRequest, LoginResponse, RegisterRequest, RemoteTokenResponse, UpdateUserRequest, UpdateEventRequest, RegistrationQuery};
 
 pub async fn get_events(
     Query(params): Query<EventQuery>,
@@ -21,6 +21,9 @@ pub async fn get_events(
     }
     if let Some(state_filter) = &params.state {
         events.retain(|e| e.state.to_lowercase() == state_filter.to_lowercase());
+    }
+    if let Some(organizer_id) = &params.organizer_id {
+        events.retain(|e| e.organizer_id.as_ref() == Some(organizer_id));
     }
 
     if let Some(sort) = &params.sort {
@@ -51,14 +54,29 @@ pub async fn get_event(
 }
 
 pub async fn create_event(
+    headers: HeaderMap,
     State(state): State<AppState>,
     Json(payload): Json<CreateEventRequest>,
 ) -> Result<Json<Event>, StatusCode> {
     let mut data = state.lock().unwrap();
+
+    // Resolve organizer_id from Bearer token
+    let organizer_id = headers
+        .get("authorization")
+        .and_then(|v| v.to_str().ok())
+        .and_then(|v| v.strip_prefix("Bearer "))
+        .and_then(|token| data.tokens.get(token))
+        .map(|&(uid, _)| uid);
+
     let now = Utc::now();
-    
+    let status = match payload.status.as_deref() {
+        Some("draft") => EventStatus::Draft,
+        _ => EventStatus::Public,
+    };
+
     let event = Event {
         id: Uuid::new_v4(),
+        organizer_id,
         title: payload.title,
         description: payload.description,
         event_type: payload.event_type,
@@ -79,7 +97,7 @@ pub async fn create_event(
         website_url: payload.website_url,
         contact_email: payload.contact_email,
         contact_phone: payload.contact_phone,
-        status: EventStatus::Public,
+        status,
         created_at: now,
         updated_at: now,
     };
@@ -301,23 +319,37 @@ pub async fn upload_file(mut multipart: Multipart) -> Result<Json<UploadResponse
     Err(StatusCode::BAD_REQUEST)
 }
 
-pub async fn get_registrations(State(state): State<AppState>) -> Result<Json<Vec<crate::Registration>>, StatusCode> {
+pub async fn get_registrations(
+    Query(params): Query<RegistrationQuery>,
+    State(state): State<AppState>,
+) -> Result<Json<Vec<Registration>>, StatusCode> {
     let data = state.lock().unwrap();
-    let registrations: Vec<crate::Registration> = data.registrations.values().cloned().collect();
-    Ok(Json(registrations))
+    let mut regs: Vec<Registration> = data.registrations.values().cloned().collect();
+    if let Some(event_id) = &params.event_id {
+        regs.retain(|r| &r.event_id == event_id);
+    }
+    Ok(Json(regs))
 }
 
 pub async fn create_registration(
     State(state): State<AppState>,
     Json(payload): Json<CreateRegistrationRequest>,
-) -> Result<Json<crate::Registration>, StatusCode> {
+) -> Result<Json<Registration>, StatusCode> {
     let mut data = state.lock().unwrap();
     let now = Utc::now();
-    
-    let registration = crate::Registration {
+
+    // Increment current_attendees on the event
+    if let Some(event) = data.events.get_mut(&payload.event_id) {
+        event.current_attendees += 1;
+    }
+
+    let registration = Registration {
         id: Uuid::new_v4(),
         event_id: payload.event_id,
         user_email: payload.user_email,
+        dancer_name: payload.dancer_name,
+        status: "active".to_string(),
+        check_in_status: "pending".to_string(),
         created_at: now,
     };
 
@@ -446,5 +478,5 @@ pub async fn register_event_remotely(
     State(state): State<AppState>,
     Json(payload): Json<CreateEventRequest>,
 ) -> Result<Json<Event>, StatusCode> {
-    create_event(State(state), Json(payload)).await
+    create_event(HeaderMap::new(), State(state), Json(payload)).await
 }

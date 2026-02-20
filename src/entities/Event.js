@@ -29,4 +29,8 @@ export class Event {
   static async delete(id) {
     return apiClient.delete(`/events/${id}`);
   }
+
+  static async getByOrganizer(organizerId) {
+    return apiClient.get(`/events?organizer_id=${organizerId}`);
+  }
 }

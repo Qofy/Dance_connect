@@ -5,6 +5,7 @@ use chrono::{DateTime, Utc, NaiveDate};
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Event {
     pub id: Uuid,
+    pub organizer_id: Option<Uuid>,   // set server-side from Bearer token
     pub title: String,
     pub description: Option<String>,
     pub event_type: Option<EventType>,
@@ -47,6 +48,18 @@ pub enum EventStatus {
     Public,
     Completed,
     Cancelled,
+}
+
+// Registration — moved here from main.rs, expanded for creator flow
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct Registration {
+    pub id: Uuid,
+    pub event_id: Uuid,
+    pub user_email: String,
+    pub dancer_name: Option<String>,
+    pub status: String,           // "active" | "cancelled"
+    pub check_in_status: String,  // "pending" | "checked_in"
+    pub created_at: DateTime<Utc>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -96,6 +109,7 @@ pub struct CreateEventRequest {
     pub website_url: Option<String>,
     pub contact_email: Option<String>,
     pub contact_phone: Option<String>,
+    pub status: Option<String>,   // "draft" | "public" — defaults to public
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -105,7 +119,7 @@ pub struct User {
     pub full_name: String,
     pub password_hash: String,
     pub role: UserRole,
-    pub user_type: String,         // "dancer" | "creator" | "both"
+    pub user_type: String,         // "dancer" | "creator" | "both" | "admin"
     pub dance_styles: Vec<String>,
     pub city: Option<String>,
     pub state: Option<String>,
@@ -179,6 +193,12 @@ pub struct EventQuery {
     pub city: Option<String>,
     pub state: Option<String>,
     pub dance_styles: Option<String>,
+    pub organizer_id: Option<Uuid>,   // filter by creator
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct RegistrationQuery {
+    pub event_id: Option<Uuid>,       // filter registrations by event
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -190,4 +210,5 @@ pub struct UploadResponse {
 pub struct CreateRegistrationRequest {
     pub event_id: Uuid,
     pub user_email: String,
+    pub dancer_name: Option<String>,
 }

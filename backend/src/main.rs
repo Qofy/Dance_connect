@@ -2,7 +2,6 @@ use axum::{
     routing::{get, post},
     Router, response::{Response, IntoResponse}, http::{StatusCode, Uri},
 };
-use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::sync::{Arc, Mutex};
 use tower_http::{cors::CorsLayer, services::ServeDir};
@@ -16,14 +15,6 @@ mod handlers;
 
 use models::*;
 use handlers::*;
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-struct Registration {
-    id: Uuid,
-    event_id: Uuid,
-    user_email: String,
-    created_at: DateTime<Utc>,
-}
 
 type AppState = Arc<Mutex<AppData>>;
 
@@ -61,6 +52,7 @@ impl AppData {
         let events = vec![
             Event {
                 id: Uuid::new_v4(),
+                organizer_id: None,
                 title: "Salsa Night Extravaganza".to_string(),
                 description: Some("Join us for an epic night of salsa dancing!".to_string()),
                 event_type: Some(models::EventType::Social),
@@ -87,6 +79,7 @@ impl AppData {
             },
             Event {
                 id: Uuid::new_v4(),
+                organizer_id: None,
                 title: "Hip-Hop Workshop".to_string(),
                 description: Some("Learn the latest hip-hop moves from professional dancers!".to_string()),
                 event_type: Some(models::EventType::Workshop),

@@ -11,18 +11,10 @@ pub mod handlers;
 
 pub type AppState = Arc<Mutex<AppData>>;
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct Registration {
-	pub id: Uuid,
-	pub event_id: Uuid,
-	pub user_email: String,
-	pub created_at: DateTime<Utc>,
-}
-
 pub struct AppData {
 	pub events: HashMap<Uuid, models::Event>,
 	pub users: HashMap<Uuid, models::User>,
-	pub registrations: HashMap<Uuid, Registration>,
+	pub registrations: HashMap<Uuid, models::Registration>,
 	pub tokens: HashMap<String, (Uuid, DateTime<Utc>)>,
 	pub remote_tokens: HashMap<String, DateTime<Utc>>,
 	pub db: Db,
@@ -41,18 +33,16 @@ impl AppData {
 			db: db.clone(),
 		};
 
-		// Load users from database
 		data.load_users_from_db();
 
-		// Add default admin if no users exist
 		if data.users.is_empty() {
 			data.add_default_users();
 		}
 
-		// Add sample events
 		let events = vec![
 			models::Event {
 				id: Uuid::new_v4(),
+				organizer_id: None,
 				title: "Salsa Night Extravaganza".to_string(),
 				description: Some("Join us for an epic night of salsa dancing!".to_string()),
 				event_type: Some(models::EventType::Social),
@@ -79,6 +69,7 @@ impl AppData {
 			},
 			models::Event {
 				id: Uuid::new_v4(),
+				organizer_id: None,
 				title: "Hip-Hop Workshop".to_string(),
 				description: Some("Learn the latest hip-hop moves from professional dancers!".to_string()),
 				event_type: Some(models::EventType::Workshop),
