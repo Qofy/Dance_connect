@@ -351,6 +351,11 @@ pub async fn register(
     State(state): State<AppState>,
     Json(payload): Json<RegisterRequest>,
 ) -> Result<Json<LoginResponse>, StatusCode> {
+    // Reject blank email or name
+    if payload.email.trim().is_empty() || payload.name.trim().is_empty() {
+        return Err(StatusCode::UNPROCESSABLE_ENTITY);
+    }
+
     let mut data = state.lock().unwrap();
 
     if data.users.values().any(|u| u.email == payload.email) {

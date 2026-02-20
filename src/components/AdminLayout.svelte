@@ -39,8 +39,21 @@
 
   function isActive(href) {
     if (typeof window === 'undefined') return false;
-    return window.location.pathname === href ||
-      (href !== '/admin' && window.location.pathname.startsWith(href));
+    const path = window.location.pathname.replace(/\/$/, '');
+    const h = String(href).replace(/\/$/, '');
+
+    // Exact match
+    if (path === h) return true;
+
+    // If href is not a prefix of the path, it's not active
+    if (!path.startsWith(h)) return false;
+
+    // Among all nav items that are prefixes of the path, only the longest (most specific)
+    // should be considered active. This avoids multiple items getting the active class.
+    return !navItems.some(item => {
+      const ih = String(item.href).replace(/\/$/, '');
+      return ih.length > h.length && path.startsWith(ih);
+    });
   }
 </script>
 
@@ -94,7 +107,7 @@
       <nav class="flex-1 p-2 space-y-1 overflow-y-auto">
         {#each navItems as { href, label, Icon } (href)}
           <a
-            {href}
+            href={href}
             onclick={() => sidebarOpen = false}
             class={`flex items-center gap-3 px-3 py-2.5 font-bold text-sm transition-all ${
               isActive(href)
@@ -133,3 +146,5 @@
     </main>
   </div>
 </div>
+
+<!-- bg-red-600 text-white neo-border -->
